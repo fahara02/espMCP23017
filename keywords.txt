@@ -1,0 +1,34 @@
+# Syntax highlighting definitions for Arduino IDE
+# Format: KEYWORD [TAB] CATEGORY
+
+# Class Definitions
+MCP23017	KEYWORD1
+MCP23S17	KEYWORD1
+MCP230XX	KEYWORD1
+
+# Functions (Public API)
+begin		KEYWORD2
+pinMode		KEYWORD2
+digitalWrite	KEYWORD2
+digitalRead	KEYWORD2
+writeGPIO	KEYWORD2
+readGPIO	KEYWORD2
+setPullup	KEYWORD2
+setPolarity	KEYWORD2
+enableInterrupts	KEYWORD2
+disableInterrupts	KEYWORD2
+getAddress	KEYWORD2
+reset		KEYWORD2
+readRegister	KEYWORD2
+writeRegister	KEYWORD2
+
+# Constants & Macros
+INPUT		KEYWORD2
+OUTPUT		KEYWORD2
+INPUT_PULLUP	KEYWORD2
+HIGH		KEYWORD2
+LOW		KEYWORD2
+
+# SPI & I2C related terms
+Wire		KEYWORD2
+SPI		KEYWORD2

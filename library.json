@@ -1,0 +1,43 @@
+{
+    "name": "espMCP23017",
+    "version": "1.0.0",
+    "description": "MCP23017/MCP23008 IO Expander library for ESP32 and Arduino",
+    "keywords": [
+        "gpio",
+        "io expander",
+        "mcp23017",
+        "mcp23018"
+    ],
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/fahara02/espMCP23017.git"
+    },
+    "authors": [
+        {
+            "name": "Faruk Hannan",
+            "email": "idea3d.faruk@email.com",
+            "url": "https://yourwebsite.com",
+            "maintainer": true
+        }
+    ],
+    "license": "MIT",
+    "frameworks": [
+        "arduino",
+        "espidf"
+    ],
+    "platforms": [
+        "espressif32",
+        "atmelavr",
+        "atmelsam"
+    ],
+    "export": {
+        "exclude": [
+            "test",
+            "docs",
+            "extras"
+        ]
+    },
+    "dependencies": {
+        "etlcpp/Embedded Template Library": "^20.39.4"
+    }
+}

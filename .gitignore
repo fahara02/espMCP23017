@@ -1,0 +1,9 @@
+.pio
+.vscode
+build
+cache
+logs
+CMakeFiles
+managed_components
+dependencies.lock
+
