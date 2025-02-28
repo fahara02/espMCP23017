@@ -26,9 +26,7 @@
         "espidf"
     ],
     "platforms": [
-        "espressif32",
-        "atmelavr",
-        "atmelsam"
+        "espressif32"
     ],
     "export": {
         "exclude": [
@@ -40,18 +38,11 @@
     "dependencies": {
         "etlcpp/Embedded Template Library": "^20.39.4"
     },
+    "headers": [
+        "MCP23017.hpp",
+        "CORE/MCPDevice.hpp"
+    ],
     "build": {
-        "includeDir": [
-            "src/",
-            "src/CORE",
-            "src/COM",
-            "src/Util"
-        ],
-        "srcFilter": [
-            "+<src/>",
-            "+<src/COM/>",
-            "+<src/CORE/>",
-            "+<src/Util/>"
-        ]
+        "libLDFMode": "deep+"
     }
 }
