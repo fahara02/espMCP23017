@@ -3,8 +3,8 @@
 #include "MCP_Constants.hpp"
 #include "MCP_Primitives.hpp"
 #include "RegisterEvents.hpp"
-#include "Utility.hpp"
-#include "Logger.hpp"
+#include "Util/Utility.hpp"
+#include "Util/Logger.hpp"
 #include "freertos/semphr.h"
 #include "memory"
 #include <type_traits>

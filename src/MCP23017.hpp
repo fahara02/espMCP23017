@@ -1,6 +1,6 @@
 #ifndef MCP23017_HPP
 #define MCP23017_HPP
-#include "MCPDevice.hpp"
+#include "CORE/MCPDevice.hpp"
 namespace COMPONENT
 {
 class MCP23017 : public MCP::MCPDevice

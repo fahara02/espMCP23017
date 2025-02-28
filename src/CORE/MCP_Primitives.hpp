@@ -1,7 +1,7 @@
 #ifndef MCP_PRIMITIVES_HPP
 #define MCP_PRIMITIVES_HPP
 #include "MCP_Constants.hpp"
-#include "Utility.hpp"
+#include "Util/Utility.hpp"
 #include "atomic"
 #include <array>
 #include <cassert>

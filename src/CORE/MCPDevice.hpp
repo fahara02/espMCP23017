@@ -9,8 +9,8 @@
 #include "SemLock.hpp"
 #include "Wire.h"
 
-#include "Logger.hpp"
-#include "i2cBus.hpp"
+#include "Util/Logger.hpp"
+#include "COM/i2cBus.hpp"
 #include "interruptManager.hpp"
 #include <array>
 #include <memory>

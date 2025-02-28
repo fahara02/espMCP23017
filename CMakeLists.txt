@@ -14,10 +14,10 @@ add_library(espMCP23017 STATIC)
 # Add the base include directory (where MCP23017.hpp lives)
 # and also add subdirectories so that includes like "MCPDevice.hpp" (in COM/) work.
 target_include_directories(espMCP23017 PUBLIC
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/MCP230XX
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/MCP230XX/COM
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/MCP230XX/CORE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/MCP230XX/Util
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/COM
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CORE
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Util
 )
 
 # ----------------------------------------------------------------------------
@@ -25,8 +25,12 @@ target_include_directories(espMCP23017 PUBLIC
 # ----------------------------------------------------------------------------
 # This collects all C and C++ source files from your library folder.
 file(GLOB_RECURSE LIB_SOURCES 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/MCP230XX/*.cpp 
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/MCP230XX/*.c
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp 
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/CORE/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/COM/*.cpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/Util/*.cpp
+    
+
 )
 target_sources(espMCP23017 PRIVATE ${LIB_SOURCES})
 

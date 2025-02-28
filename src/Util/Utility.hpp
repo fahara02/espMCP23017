@@ -1,7 +1,7 @@
 #ifndef UTILITY_HPP
 #define UTILITY_HPP
-#include "MCP_Constants.hpp"
-#include "SerialBus.hpp"
+#include "CORE/MCP_Constants.hpp"
+#include "COM/SerialBus.hpp"
 namespace MCP
 {
 
