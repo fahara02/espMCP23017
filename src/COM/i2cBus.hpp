@@ -1,14 +1,14 @@
 #ifndef I2C_BUS_HPP
 #define I2C_BUS_HPP
 #include "Arduino.h"
-#include "MCP_Constants.hpp"
-#include "SemLock.hpp"
+#include "CORE/MCP_Constants.hpp"
+#include "CORE/SemLock.hpp"
 #include "Wire.h"
-#include "Logger.hpp"
+#include "Util/Logger.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include <memory>
-#include "Utility.hpp"
+#include "Util/Utility.hpp"
 #include "driver/i2c_master.h"
 
 namespace MCP
