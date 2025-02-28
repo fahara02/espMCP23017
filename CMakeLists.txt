@@ -12,10 +12,8 @@ add_library(espMCP23017 STATIC)
 target_include_directories(espMCP23017 PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}/src
     ${CMAKE_CURRENT_SOURCE_DIR}/src/MCP230XX
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/MCP230XX/COM
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/MCP230XX/CORE
-    ${CMAKE_CURRENT_SOURCE_DIR}/src/MCP230XX/Util
 )
+
 
 # Collect source files
 file(GLOB_RECURSE SOURCES src/MCP230XX/**/*.cpp src/MCP230XX/**/*.c)

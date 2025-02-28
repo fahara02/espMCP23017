@@ -6,4 +6,5 @@ logs
 CMakeFiles
 managed_components
 dependencies.lock
+CMakeCache
 

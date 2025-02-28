@@ -1,6 +1,5 @@
-# This file was automatically generated for projects
-# without default 'CMakeLists.txt' file.
+file(GLOB_RECURSE SOURCES ${CMAKE_CURRENT_SOURCE_DIR}/*.cpp ${CMAKE_CURRENT_SOURCE_DIR}/*.c)
 
-FILE(GLOB_RECURSE app_sources ${CMAKE_SOURCE_DIR}/src/*.*)
+add_library(espMCP23017 STATIC ${SOURCES})
 
-idf_component_register(SRCS ${app_sources})
+target_include_directories(espMCP23017 PUBLIC ${CMAKE_CURRENT_SOURCE_DIR})
