@@ -41,7 +41,12 @@
         "etlcpp/Embedded Template Library": "^20.39.4"
     },
     "build": {
-        "includeDir": "src/MCP230XX",
+        "includeDir": [
+            "src/MCP230XX",
+            "src/MCP230XX/CORE",
+            "src/MCP230XX/COM",
+            "src/MCP230XX/Util"
+        ],
         "srcFilter": [
             "+<src/>",
             "+<src/MCP230XX/>",
