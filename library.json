@@ -42,17 +42,16 @@
     },
     "build": {
         "includeDir": [
-            "src/MCP230XX",
-            "src/MCP230XX/CORE",
-            "src/MCP230XX/COM",
-            "src/MCP230XX/Util"
+            "src/",
+            "src/CORE",
+            "src/COM",
+            "src/Util"
         ],
         "srcFilter": [
             "+<src/>",
-            "+<src/MCP230XX/>",
-            "+<src/MCP230XX/COM/>",
-            "+<src/MCP230XX/CORE/>",
-            "+<src/MCP230XX/Util/>"
+            "+<src/COM/>",
+            "+<src/CORE/>",
+            "+<src/Util/>"
         ]
     }
 }
