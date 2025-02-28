@@ -2,7 +2,7 @@
 #define REGISTER_EVENTS_HPP
 
 #include "Arduino.h"
-#include "MCP_Constants.hpp"
+#include "CORE/MCP_Constants.hpp"
 #include "Util/Logger.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"

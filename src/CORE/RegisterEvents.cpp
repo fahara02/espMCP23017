@@ -1,4 +1,4 @@
-#include "RegisterEvents.hpp"
+#include "CORE/RegisterEvents.hpp"
 
 EventGroupHandle_t EventManager::registerEventGroup = nullptr;
 

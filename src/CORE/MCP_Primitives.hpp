@@ -1,6 +1,6 @@
 #ifndef MCP_PRIMITIVES_HPP
 #define MCP_PRIMITIVES_HPP
-#include "MCP_Constants.hpp"
+#include "CORE/MCP_Constants.hpp"
 #include "Util/Utility.hpp"
 #include "atomic"
 #include <array>

@@ -1,7 +1,7 @@
 #ifndef MCP_GPIO_BANKS_HPP
 #define MCP_GPIO_BANKS_HPP
-#include "MCP_Primitives.hpp"
-#include "MCP_Registers.hpp"
+#include "CORE/MCP_Primitives.hpp"
+#include "CORE/MCP_Registers.hpp"
 #include "esp_log.h"
 #include "COM/i2cBus.hpp"
 #include "memory"

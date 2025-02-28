@@ -1,9 +1,9 @@
 #ifndef INTERRUPT_MANAGER_HPP
 #define INTERRUPT_MANAGER_HPP
 #include "Arduino.h"
-#include "MCP_Constants.hpp"
-#include "MCP_Registers.hpp"
-#include "RegisterEvents.hpp"
+#include "CORE/MCP_Constants.hpp"
+#include "CORE/MCP_Registers.hpp"
+#include "CORE/RegisterEvents.hpp"
 #include "Util/Utility.hpp"
 #include "COM/i2cBus.hpp"
 

@@ -1,8 +1,8 @@
 #ifndef MCP_REGISTERS_HPP
 #define MCP_REGISTERS_HPP
-#include "MCP_Constants.hpp"
-#include "MCP_Primitives.hpp"
-#include "RegisterEvents.hpp"
+#include "CORE/MCP_Constants.hpp"
+#include "CORE/MCP_Primitives.hpp"
+#include "CORE/RegisterEvents.hpp"
 #include "Util/Utility.hpp"
 #include "Util/Logger.hpp"
 #include "freertos/semphr.h"

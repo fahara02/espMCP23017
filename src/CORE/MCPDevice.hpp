@@ -2,16 +2,16 @@
 #define MCP_DEVICE_HPP
 
 #include "Arduino.h"
-#include "MCP_GPIO_banks.hpp"
-#include "MCP_Primitives.hpp"
-#include "MCP_Registers.hpp"
-#include "RegisterEvents.hpp"
-#include "SemLock.hpp"
+#include "CORE/MCP_GPIO_banks.hpp"
+#include "CORE/MCP_Primitives.hpp"
+#include "CORE/MCP_Registers.hpp"
+#include "CORE/RegisterEvents.hpp"
+#include "CORE/SemLock.hpp"
 #include "Wire.h"
 
 #include "Util/Logger.hpp"
 #include "COM/i2cBus.hpp"
-#include "interruptManager.hpp"
+#include "CORE/interruptManager.hpp"
 #include <array>
 #include <memory>
 #include <tuple>

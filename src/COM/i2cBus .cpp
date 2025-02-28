@@ -1,4 +1,4 @@
-#include "i2cBus.hpp"
+#include "COM/i2cBus.hpp"
 #define I2C_BUS "I2C_BUS"
 namespace MCP
 {
