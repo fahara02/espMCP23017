@@ -3,7 +3,8 @@
     "version": "0.1.0",
     "description": "MCP23017/MCP23008 IO Expander library for ESP32 and Arduino",
     "keywords": [
-        "Logging"
+        "MCP23017",
+        "ESP IO expansion"
     ],
     "repository": {
         "type": "git",

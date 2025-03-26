@@ -4,7 +4,7 @@
 #include "CORE/MCP_Constants.hpp"
 #include "CORE/SemLock.hpp"
 #include "Wire.h"
-#include "Util/Logger.hpp"
+#include "Logger.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/semphr.h"
 #include <memory>
