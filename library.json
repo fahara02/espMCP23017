@@ -36,7 +36,8 @@
         ]
     },
     "dependencies": {
-        "etlcpp/Embedded Template Library": "^20.39.4"
+        "etlcpp/Embedded Template Library": "^20.39.4",
+        "fahara02/Logger": "^0.1.0"
     },
     "headers": [
         "MCP23017.hpp",
