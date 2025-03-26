@@ -4,7 +4,7 @@
 #include "CORE/MCP_Primitives.hpp"
 #include "CORE/RegisterEvents.hpp"
 #include "Util/Utility.hpp"
-#include "Util/Logger.hpp"
+#include "Logger.hpp"
 #include "freertos/semphr.h"
 #include "memory"
 #include <type_traits>

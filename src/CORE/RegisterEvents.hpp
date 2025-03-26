@@ -3,7 +3,7 @@
 
 #include "Arduino.h"
 #include "CORE/MCP_Constants.hpp"
-#include "Util/Logger.hpp"
+#include "Logger.hpp"
 #include "freertos/FreeRTOS.h"
 #include "freertos/event_groups.h"
 #include "freertos/semphr.h"

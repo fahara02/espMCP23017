@@ -9,7 +9,7 @@
 #include "CORE/SemLock.hpp"
 #include "Wire.h"
 
-#include "Util/Logger.hpp"
+#include "Logger.hpp"
 #include "COM/i2cBus.hpp"
 #include "CORE/interruptManager.hpp"
 #include <array>
