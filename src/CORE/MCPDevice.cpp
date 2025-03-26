@@ -1,7 +1,7 @@
 #include "CORE/MCPDevice.hpp"
 #include "climits"
 #include "driver/gpio.h"
-#include "Util/Logger.hpp"
+#include "Logger.hpp"
 #include "esp_task_wdt.h"
 namespace MCP
 {
