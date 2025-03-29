@@ -166,7 +166,3 @@ int I2CBus::write_mcp_register(const uint8_t reg, uint16_t value, bool map8Bit)
 }
 
 } // namespace MCP
-  // // Reinitialize I2C
-  // i2c_driver_delete(i2cPort_);
-  // i2c_param_config(i2cPort_, &i2cConfig_);
-  // i2c_driver_install(i2cPort_, I2C_MODE_MASTER, 0, 0, 0);

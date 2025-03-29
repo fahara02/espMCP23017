@@ -161,6 +161,8 @@ class GPIO_BANK
 	}
 
 	// SET PIN VALUE
+	// Inside the GPIO_BANK class declaration
+	void setOutput(uint8_t value) { regs.olat->setValue(value); }
 	void setPinState(PIN pin, bool state)
 	{
 		assert(Util::getPortFromPin(pin) == port_name && "Invalid pin ");

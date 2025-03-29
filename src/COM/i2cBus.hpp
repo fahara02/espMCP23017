@@ -1,5 +1,4 @@
-#ifndef I2C_BUS_HPP
-#define I2C_BUS_HPP
+#pragma once
 #include "Arduino.h"
 #include "CORE/MCP_Constants.hpp"
 #include "CORE/SemLock.hpp"
@@ -56,4 +55,3 @@ class I2CBus
 };
 
 } // namespace MCP
-#endif

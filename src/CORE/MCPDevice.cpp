@@ -269,12 +269,12 @@ void MCPDevice::digitalWrite(const PORT port, const uint8_t pinmask, const uint8
 {
 	GPIO_BANK* gpioBank = (port == PORT::GPIOA) ? gpioBankA.get() : gpioBankB.get();
 	gpioBank->setGeneralMask(pinmask);
-	gpioBank->setPinState(pinmask, static_cast<bool>(level));
+	gpioBank->setOutput(level);
 }
 void MCPDevice::digitalWrite(const PORT port, const uint8_t level)
 {
 	GPIO_BANK* gpioBank = (port == PORT::GPIOA) ? gpioBankA.get() : gpioBankB.get();
-	gpioBank->setPinState(static_cast<bool>(level));
+	gpioBank->setOutput(level);
 }
 void MCPDevice::digitalWrite(const Pin pin, const uint8_t level)
 {
