@@ -102,8 +102,8 @@ class MCPDevice
 		pinMode(port, pinmask, mode);
 	}
 
-	void digitalWrite(const int pin, const uint8_t level);
-	void digitalWrite(const Pin pin, const uint8_t level);
+	void digitalWrite(const int pin, const bool level);
+	void digitalWrite(const Pin pin, const bool level);
 	void digitalWrite(const PORT port, const uint8_t pinmask, const uint8_t level);
 	void digitalWrite(const PORT port, const uint8_t level);
 	template<typename FirstPin, typename... RestPins,
@@ -113,7 +113,7 @@ class MCPDevice
 	{
 		uint8_t pinmask = generateMask(first, rest...);
 		PORT port = first.getPort();
-		return digitalWrite(port, pinmask, static_cast<bool>(level));
+		return digitalWrite(port, pinmask, level);
 	}
 
 	bool digitalRead(const int pin);
