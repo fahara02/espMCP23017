@@ -169,19 +169,37 @@ class GPIO_BANK
 	}
 
 	// Get PIN VALUE
-	bool getPinState(MCP::PIN p)
+	int getPinState(MCP::PIN p)
 	{
 
 		assert(Util::getPortFromPin(p) == port_name && "Invalid pin ");
 		return regs.gpio->getBitField(static_cast<uint8_t>(p));
 	}
-	uint8_t getPinState(uint8_t pinmask)
+	int getPinState(uint8_t pinmask)
 	{
-
-		uint8_t value = (regs.gpio->getValue() & pinmask);
-		return value;
+		int raw_value = regs.gpio->getValue();
+		if(raw_value == -1)
+		{
+			return -1;
+		}
+		else
+		{
+			uint8_t value = (static_cast<uint8_t>(raw_value) & pinmask);
+			return value;
+		}
 	}
-	uint8_t getPinState() { return regs.gpio->getValue(); }
+	int getPinState()
+	{
+		int raw_value = regs.gpio->getValue();
+		if(raw_value == -1)
+		{
+			return -1;
+		}
+		else
+		{
+			return static_cast<uint8_t>(raw_value)
+		}
+	}
 
 	// SET PIN POLARITY
 	void setInputPolarity(PIN pin, INPUT_POLARITY pol)

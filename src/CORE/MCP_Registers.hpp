@@ -304,11 +304,11 @@ struct Register
 			}
 		}
 	}
-	uint8_t getValue(bool intrFun = false)
+	int getValue(bool intrFun = false)
 	{
 		SemLock lock(readMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
-			return 0xFF;
+			return -1;
 		EventManager::createEvent(identity_, RegisterEvent::READ_REQUEST, 0, intrFun);
 
 		EventBits_t bits = xEventGroupWaitBits(
@@ -322,7 +322,7 @@ struct Register
 			LOG::ERROR(REG_TAG, "Error Event Created in getValue!");
 			EventManager::createEvent(identity_, RegisterEvent::DATA_RECEIVED, 0xFF);
 			EventManager::clearBits(RegisterEvent::DATA_RECEIVED);
-			return 0xFF;
+			return -1;
 		}
 		currentEvent* event = EventManager::getEvent(RegisterEvent::DATA_RECEIVED);
 		EventManager::acknowledgeEvent(event);
@@ -330,11 +330,11 @@ struct Register
 
 		return value_;
 	}
-	bool getBitField(uint8_t bit, bool intrFun = false)
+	int getBitField(uint8_t bit, bool intrFun = false)
 	{
 		SemLock lock(readMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
-			return 0xFF;
+			return -1;
 		EventManager::createEvent(identity_, RegisterEvent::READ_REQUEST, intrFun);
 
 		EventBits_t bits = xEventGroupWaitBits(
@@ -346,12 +346,12 @@ struct Register
 			LOG::ERROR(REG_TAG, "Timeout waiting for DATA_RECEIVED event for getField!");
 			EventManager::createEvent(identity_, RegisterEvent::ERROR, config_.getSettingValue());
 			LOG::ERROR(REG_TAG, "Error Event Created in GetBitField!");
-			return 0xFF;
+			return -1;
 		}
 		currentEvent* event = EventManager::getEvent(RegisterEvent::DATA_RECEIVED);
 		EventManager::acknowledgeEvent(event);
 		EventManager::clearBits(RegisterEvent::DATA_RECEIVED);
-		return (bit < 8) ? Util::BIT::isSet(value_, bit) : false;
+		return static_cast<uint8_t>((bit < 8) ? Util::BIT::isSet(value_, bit) : false);
 	}
 	void applyMask(uint8_t mask, bool intrFun = false)
 	{
