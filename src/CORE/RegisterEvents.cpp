@@ -77,7 +77,7 @@ bool EventManager::createEvent(registerIdentity identity, RegisterEvent e, uint1
 	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
 	if(!lock.acquired())
 	{
-		return;
+		return false;
 	}
 	size_t currentTail = tail.load(std::memory_order_relaxed);
 	size_t nextTail = (currentTail + 1) % MAX_EVENTS;

@@ -27,6 +27,10 @@ MCPDevice::MCPDevice(MCP_MODEL model, gpio_num_t sda, gpio_num_t scl, gpio_num_t
 MCPDevice::~MCPDevice() = default;
 void MCPDevice::configure(const Settings& setting)
 {
+	SemLock lock(sharedPtrMutex, MUTEX_TIMEOUT);
+	if(!lock.acquired())
+		return;
+
 	if(cntrlRegA && cntrlRegB)
 	{
 		if(configuration_.configure(setting))
@@ -46,6 +50,9 @@ void MCPDevice::updatei2cAddress()
 
 void MCPDevice::loadSettings()
 {
+	SemLock lock(sharedPtrMutex, MUTEX_TIMEOUT);
+	if(!lock.acquired())
+		return;
 
 	if(settings_ == defaultSettings_)
 	{
@@ -657,6 +664,9 @@ Register* MCPDevice::getGPIORegister(REG reg, PORT port)
 }
 Register* MCPDevice::getIntRegister(REG reg, PORT port)
 {
+	SemLock lock(sharedPtrMutex, MUTEX_TIMEOUT);
+	if(!lock.acquired())
+		return nullptr;
 
 	return interruptManager_->getRegister(port, reg);
 }
@@ -712,6 +722,10 @@ std::unordered_map<std::tuple<PORT, REG>, uint8_t> MCPDevice::populateAddressMap
 
 void MCPDevice::updateAddressMap(bool bankMode)
 {
+	SemLock lock(sharedPtrMutex, MUTEX_TIMEOUT);
+	if(!lock.acquired())
+		return;
+
 	addressMap_.clear();
 	addressMap_ = populateAddressMap(bankMode);
 }
@@ -721,6 +735,10 @@ void MCPDevice::initIntrGPIOPins(gpio_int_type_t modeA, gpio_int_type_t modeB) {
 void MCPDevice::setupDefaultIntterupt(INTR_TYPE type, INTR_OUTPUT_TYPE outtype,
 									  PairedInterrupt sharedIntr)
 {
+	SemLock lock(sharedPtrMutex, MUTEX_TIMEOUT);
+	if(!lock.acquired())
+		return;
+
 	interruptManager_->setup(type, outtype, sharedIntr);
 }
 
