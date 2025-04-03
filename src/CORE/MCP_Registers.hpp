@@ -9,6 +9,7 @@
 #include "memory"
 #include <type_traits>
 #include <unordered_map>
+#include "SemLock.hpp"
 
 #define REG_TAG "MCP_REGISTERS"
 namespace MCP
@@ -194,6 +195,7 @@ struct Register
 	const MCP_MODEL model;
 	const MCP::REG reg;
 	const MCP::PORT port;
+	SemaphoreHandle_t readMutex;
 	Register(MCP_MODEL m = MCP_MODEL::MCP23017, MCP::REG rg = MCP::REG::IODIR,
 			 MCP::PORT p = MCP::PORT::GPIOA, bool bankMode = false, bool readonly = false) :
 		model(m), reg(rg), port(p), readOnly_(readonly), bankSeparated_(bankMode), value_(0),
@@ -205,7 +207,7 @@ struct Register
 
 	void init()
 	{
-
+		readMutex = xSemaphoreCreateMutex();
 		if(reg == REG::IOCON)
 		{
 			value_ = 0X00;
@@ -304,7 +306,9 @@ struct Register
 	}
 	uint8_t getValue(bool intrFun = false)
 	{
-
+		SemLock lock(readMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return 0xFF;
 		EventManager::createEvent(identity_, RegisterEvent::READ_REQUEST, 0, intrFun);
 
 		EventBits_t bits = xEventGroupWaitBits(
@@ -328,6 +332,9 @@ struct Register
 	}
 	bool getBitField(uint8_t bit, bool intrFun = false)
 	{
+		SemLock lock(readMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return 0xFF;
 		EventManager::createEvent(identity_, RegisterEvent::READ_REQUEST, intrFun);
 
 		EventBits_t bits = xEventGroupWaitBits(

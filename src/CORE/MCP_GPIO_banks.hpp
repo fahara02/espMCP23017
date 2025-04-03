@@ -16,6 +16,7 @@ class GPIO_BANK
 {
   private:
 	SemaphoreHandle_t bankMutex;
+	SemaphoreHandle_t readMutex;
 	std::array<Pin, PIN_PER_BANK> Pins;
 	GPIORegisters regs;
 
@@ -24,6 +25,7 @@ class GPIO_BANK
 		Pins(createPins(port)), regs(GPIORegisters(icon)), model(m), generalMask(0XFF),
 		port_name(port)
 	{
+		readMutex = xSemaphoreCreateMutex();
 		bankMutex = xSemaphoreCreateMutex();
 		regs.setup(model, port_name, bankMode);
 		init();
@@ -145,6 +147,7 @@ class GPIO_BANK
 	// Get PIN VALUE
 	bool getPinState(MCP::PIN p)
 	{
+
 		assert(Util::getPortFromPin(p) == port_name && "Invalid pin ");
 		return regs.gpio->getBitField(static_cast<uint8_t>(p));
 	}
