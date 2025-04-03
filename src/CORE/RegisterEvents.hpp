@@ -12,7 +12,7 @@
 #include <memory>
 #include <unordered_map>
 #include "SemLock.hpp"
-
+class MCPDevice; // Forward declaration
 enum class RegisterEvent : EventBits_t
 {
 	BANK_MODE_CHANGED = 1 << 0,
@@ -91,6 +91,7 @@ class EventManager
 	static bool acknowledgeEvent(currentEvent* event);
 	static size_t getQueueSize();
 	static void clearAllErrorEvents();
+	static void clearEventsForIdentity(const registerIdentity& identity);
 
   private:
 	static const EventBits_t REGISTER_EVENT_BITS_MASK;

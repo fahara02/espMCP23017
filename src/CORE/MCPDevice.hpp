@@ -75,7 +75,12 @@ class MCPDevice : public std::enable_shared_from_this<MCPDevice>
 	static SemaphoreHandle_t regRWmutex;
 	static SemaphoreHandle_t sharedPtrMutex;
 	std::atomic<bool> shutdownRequested_{false};
+	std::atomic<bool> isActive{true};
 	TaskHandle_t eventTaskHandle;
+	struct TaskParam
+	{
+		std::weak_ptr<MCPDevice> weakDevice;
+	};
 
   public:
 	MCPDevice(MCP_MODEL model, gpio_num_t sda, gpio_num_t scl, gpio_num_t reset, bool pinA2 = false,
@@ -107,7 +112,7 @@ class MCPDevice : public std::enable_shared_from_this<MCPDevice>
 
 	void digitalWrite(const int pin, const bool level);
 	void digitalWrite(const Pin pin, const bool level);
-	void digitalWrite(const PORT port, const uint8_t pinmask, const uint8_t level);
+	void digitalWrite(const PORT port, const uint8_t pinmask, const bool level);
 	void digitalWrite(const PORT port, const uint8_t level);
 	template<typename FirstPin, typename... RestPins,
 			 typename = std::enable_if_t<(std::is_same_v<FirstPin, MCP::Pin> && ... &&

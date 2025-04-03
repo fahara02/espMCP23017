@@ -27,17 +27,32 @@ MCPDevice::MCPDevice(MCP_MODEL model, gpio_num_t sda, gpio_num_t scl, gpio_num_t
 }
 MCPDevice::~MCPDevice()
 {
-	shutdownRequested_ = true; // Signal task to exit
+	shutdownRequested_.store(true); // Signal task to exit
 
 	if(eventTaskHandle != nullptr)
 	{
-		// Wait for task to finish (adjust timeout as needed)
-		ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(1000));
+
+		ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(100));
 		vTaskDelete(eventTaskHandle);
 		eventTaskHandle = nullptr;
 	}
+	for(const auto& regPair: addressMap_)
+	{
+		// regPair.first = tuple<PORT, REG>
+		// regPair.second = uint8_t (register address)
 
-	// Cleanup other resources if necessary
+		MCP::PORT port = std::get<0>(regPair.first); // Get PORT from tuple
+		MCP::REG reg = std::get<1>(regPair.first); // Get REG from tuple
+		uint8_t reg_address = regPair.second; // Get register address
+
+		registerIdentity identity{
+			reg, // MCP::REG
+			port, // MCP::PORT
+			reg_address // uint8_t register address
+		};
+
+		EventManager::clearEventsForIdentity(identity);
+	}
 }
 void MCPDevice::configure(const Settings& setting)
 {
@@ -172,7 +187,7 @@ void MCPDevice::init()
 	setupI2c(sda, scl, DEFAULT_I2C_CLK_FRQ, DEFAULT_I2C_TIMEOUT);
 	i2cBus_.init();
 	EventManager::initializeEventGroups();
-	startEventMonitorTask(this);
+	startEventMonitorTask();
 	interruptManager_->setupInterruptMask(PORT::GPIOB, 0XFF);
 	setupDefaultIntterupt();
 	resetInterruptRegisters();
@@ -224,14 +239,11 @@ bool MCPDevice::enableInterrupt() { return interruptManager_->enableInterrupt();
 bool MCPDevice::resetInterruptRegisters() { return interruptManager_->resetInterruptRegisters(); }
 void MCPDevice::startEventMonitorTask()
 {
-	auto self = shared_from_this(); // Keep alive
-	xTaskCreatePinnedToCore(
-		[](void* param) {
-			auto device = *static_cast<std::shared_ptr<MCPDevice>*>(param);
-			delete static_cast<std::shared_ptr<MCPDevice>*>(param);
-			EventMonitorTask(device.get());
-		},
-		"EventMonitorTask", 8192, new std::shared_ptr<MCPDevice>(self), 5, &eventTaskHandle, 0);
+
+	TaskParam* param = new TaskParam{weak_from_this()};
+
+	xTaskCreatePinnedToCore(EventMonitorTask, "EventMonitorTask", 8192, param, 5, &eventTaskHandle,
+							0);
 }
 
 void MCPDevice::pinMode(const PORT port, const uint8_t pinmask, const uint8_t mode)
@@ -360,14 +372,23 @@ void MCPDevice::invertInput(int pin, bool invert)
 
 void MCPDevice::EventMonitorTask(void* param)
 {
-	MCPDevice* device = static_cast<MCPDevice*>(param);
+	auto* taskParam = static_cast<TaskParam*>(param);
+	std::weak_ptr<MCPDevice> weakDevice = taskParam->weakDevice;
+	delete taskParam;
 	uint8_t recovery_attempts = 0;
 	TickType_t recovery_delay = pdMS_TO_TICKS(500);
 
-	while(!device->shutdownRequested_)
+	while(true)
 	{
+		std::shared_ptr<MCPDevice> device = weakDevice.lock();
+		if(!device || device->shutdownRequested_)
+		{
+			break; // Exit if device is destroyed or shutdown signaled
+		}
+
 		if(device->errorState_)
 		{
+
 			GLOBAL_ERROR_COUNT++;
 			LOG::WARNING(MCP_TAG, "Device in error state %d, attempt %d, waiting for recovery...",
 						 GLOBAL_ERROR_COUNT, recovery_attempts + 1);
@@ -438,11 +459,6 @@ void MCPDevice::EventMonitorTask(void* param)
 			{
 				LOG::INFO(MCP_TAG, "EventMonitorTask received eventBits: 0x%08X", eventBits);
 				LOG::ERROR(MCP_TAG, "ERROR event detected! Value: 0x%02X", event->data);
-
-				// Potential recovery action:
-				// - Reset I2C bus
-				// - Reinitialize MCP23017 settings
-
 				EventManager::acknowledgeEvent(event);
 				EventManager::clearBits(RegisterEvent::ERROR);
 				device->errorState_ = true;
@@ -518,6 +534,7 @@ void MCPDevice::EventMonitorTask(void* param)
 
 		vTaskDelay(pdMS_TO_TICKS(10));
 	}
+
 	vTaskDelete(NULL);
 }
 void MCPDevice::handleBankModeEvent(currentEvent* ev)

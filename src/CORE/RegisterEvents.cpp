@@ -1,5 +1,5 @@
 #include "CORE/RegisterEvents.hpp"
-
+#include "CORE/MCPDevice.hpp"
 EventGroupHandle_t EventManager::registerEventGroup = nullptr;
 SemaphoreHandle_t EventManager::eventMutex = xSemaphoreCreateMutex();
 std::array<currentEvent, EventManager::MAX_EVENTS> EventManager::eventBuffer;
@@ -16,7 +16,25 @@ const EventBits_t EventManager::REGISTER_EVENT_BITS_MASK =
 	static_cast<EventBits_t>(RegisterEvent::DATA_RECEIVED) |
 	static_cast<EventBits_t>(RegisterEvent::ERROR) |
 	static_cast<EventBits_t>(RegisterEvent::RESTART);
+void EventManager::clearEventsForIdentity(const registerIdentity& identity)
+{
+	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
+	if(!lock.acquired())
+		return;
 
+	size_t currentHead = head.load();
+	size_t currentTail = tail.load();
+
+	while(currentHead != currentTail)
+	{
+		if(eventBuffer[currentHead].regIdentity == identity)
+		{
+			eventBuffer[currentHead].AcknowledgeEvent();
+			eventIndexMap.erase(eventBuffer[currentHead].regIdentity);
+		}
+		currentHead = (currentHead + 1) % MAX_EVENTS;
+	}
+}
 void EventManager::initializeEventGroups()
 {
 	if(registerEventGroup == nullptr)
