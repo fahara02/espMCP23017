@@ -41,7 +41,7 @@ class GPIO_BANK
 		// invoked and icon is updated  ,just notify this class for updating address
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
-			return;
+			return false;
 		bankMode = value;
 		regs.updateAddress(bankMode);
 		return true;
@@ -50,7 +50,7 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
-			return;
+			return false;
 		return regs.updateRegisterValue(reg_address, value);
 	}
 
