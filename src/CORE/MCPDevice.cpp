@@ -3,6 +3,7 @@
 #include "driver/gpio.h"
 #include "Logger.hpp"
 #include "esp_task_wdt.h"
+
 namespace MCP
 {
 static int GLOBAL_ERROR_COUNT = 0;
@@ -24,7 +25,20 @@ MCPDevice::MCPDevice(MCP_MODEL model, gpio_num_t sda, gpio_num_t scl, gpio_num_t
 
 {
 }
-MCPDevice::~MCPDevice() = default;
+MCPDevice::~MCPDevice()
+{
+	shutdownRequested_ = true; // Signal task to exit
+
+	if(eventTaskHandle != nullptr)
+	{
+		// Wait for task to finish (adjust timeout as needed)
+		ulTaskNotifyTake(pdTRUE, pdMS_TO_TICKS(1000));
+		vTaskDelete(eventTaskHandle);
+		eventTaskHandle = nullptr;
+	}
+
+	// Cleanup other resources if necessary
+}
 void MCPDevice::configure(const Settings& setting)
 {
 	SemLock lock(sharedPtrMutex, MUTEX_TIMEOUT);
@@ -208,17 +222,16 @@ void MCPDevice::initGPIOPins()
 
 bool MCPDevice::enableInterrupt() { return interruptManager_->enableInterrupt(); }
 bool MCPDevice::resetInterruptRegisters() { return interruptManager_->resetInterruptRegisters(); }
-void MCPDevice::startEventMonitorTask(MCPDevice* device)
+void MCPDevice::startEventMonitorTask()
 {
-	if(!device)
-	{
-		ESP_LOGE(MCP_TAG, "no_device");
-	}
-	else
-	{
-		xTaskCreatePinnedToCore(EventMonitorTask, "EventMonitorTask", 8192, device, 5,
-								&eventTaskHandle, 0);
-	}
+	auto self = shared_from_this(); // Keep alive
+	xTaskCreatePinnedToCore(
+		[](void* param) {
+			auto device = *static_cast<std::shared_ptr<MCPDevice>*>(param);
+			delete static_cast<std::shared_ptr<MCPDevice>*>(param);
+			EventMonitorTask(device.get());
+		},
+		"EventMonitorTask", 8192, new std::shared_ptr<MCPDevice>(self), 5, &eventTaskHandle, 0);
 }
 
 void MCPDevice::pinMode(const PORT port, const uint8_t pinmask, const uint8_t mode)
@@ -351,7 +364,7 @@ void MCPDevice::EventMonitorTask(void* param)
 	uint8_t recovery_attempts = 0;
 	TickType_t recovery_delay = pdMS_TO_TICKS(500);
 
-	while(true)
+	while(!device->shutdownRequested_)
 	{
 		if(device->errorState_)
 		{

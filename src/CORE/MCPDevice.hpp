@@ -19,6 +19,7 @@
 #include <unordered_map>
 #include <utility>
 #include <vector>
+#include <memory>
 
 #define MCP_TAG "MCPDevice"
 namespace std
@@ -37,7 +38,7 @@ struct hash<std::tuple<MCP::PORT, MCP::REG>>
 namespace MCP
 {
 
-class MCPDevice
+class MCPDevice : public std::enable_shared_from_this<MCPDevice>
 {
   private:
 	MCP_MODEL model_;
@@ -73,6 +74,7 @@ class MCPDevice
 
 	static SemaphoreHandle_t regRWmutex;
 	static SemaphoreHandle_t sharedPtrMutex;
+	std::atomic<bool> shutdownRequested_{false};
 	TaskHandle_t eventTaskHandle;
 
   public:
@@ -262,7 +264,7 @@ class MCPDevice
 	uint8_t getRegisterAddress(REG reg, PORT port) const;
 	uint8_t getRegisterSavedValue(REG reg, PORT port) const;
 
-	void startEventMonitorTask(MCPDevice* device);
+	void startEventMonitorTask();
 	static void EventMonitorTask(void* param);
 
 	void handleReadEvent(currentEvent* ev);
