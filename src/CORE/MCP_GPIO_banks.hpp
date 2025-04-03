@@ -43,7 +43,10 @@ class GPIO_BANK
 		// invoked and icon is updated  ,just notify this class for updating address
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for update bank");
 			return false;
+		}
 		bankMode = value;
 		regs.updateAddress(bankMode);
 		return true;
@@ -52,7 +55,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for update regvalue");
 			return false;
+		}
 		return regs.updateRegisterValue(reg_address, value);
 	}
 
@@ -70,7 +76,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed pin direction");
 			return;
+		}
 		assert(Util::getPortFromPin(p) == port_name && "Invalid pin ");
 		regs.iodir->setBitField(static_cast<uint8_t>(p), m == GPIO_MODE::GPIO_INPUT);
 	}
@@ -78,7 +87,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for pin direction2");
 			return;
+		}
 		if(mode == GPIO_MODE::GPIO_INPUT)
 		{
 			regs.iodir->applyMask(pinmask);
@@ -93,7 +105,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for pindirection 3");
 			return;
+		}
 		if(mode == GPIO_MODE::GPIO_INPUT)
 		{
 			regs.iodir->applyMask(generalMask);
@@ -109,7 +124,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for pullup");
 			return;
+		}
 		assert(Util::getPortFromPin(pin) == port_name && "Invalid pin ");
 		regs.gppu->setBitField(static_cast<uint8_t>(pin), mode == PULL_MODE::ENABLE_PULLUP);
 	}
@@ -118,7 +136,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for pullup2");
 			return;
+		}
 		if(mode == PULL_MODE::ENABLE_PULLUP)
 		{
 			regs.gppu->applyMask(pinMask);
@@ -133,7 +154,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for pullup3");
 			return;
+		}
 		if(mode == PULL_MODE::ENABLE_PULLUP)
 		{
 			regs.gppu->applyMask(generalMask);
@@ -164,7 +188,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for polarity");
 			return;
+		}
 		assert(Util::getPortFromPin(pin) == port_name && "Invalid pin ");
 		regs.ipol->setBitField(static_cast<uint8_t>(pin), pol == INPUT_POLARITY::INVERTED);
 	}
@@ -172,7 +199,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for polarity 2");
 			return;
+		}
 		if(pol == INPUT_POLARITY::INVERTED)
 		{
 			regs.ipol->applyMask(pinmask);
@@ -186,7 +216,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for polarity 3");
 			return;
+		}
 		if(pol == INPUT_POLARITY::INVERTED)
 		{
 			regs.ipol->applyMask(generalMask);
@@ -203,14 +236,21 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for output");
 			return;
+		}
+
 		regs.olat->setValue(value);
 	}
 	void setPinState(PIN pin, bool state)
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for pinstate");
 			return;
+		}
 		assert(Util::getPortFromPin(pin) == port_name && "Invalid pin ");
 		regs.olat->setBitField(static_cast<uint8_t>(pin), state);
 	}
@@ -219,7 +259,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for pinstate 2");
 			return;
+		}
 		if(state)
 		{
 			regs.olat->applyMask(pinmask);
@@ -234,7 +277,10 @@ class GPIO_BANK
 	{
 		SemLock lock(bankMutex, MUTEX_TIMEOUT);
 		if(!lock.acquired())
+		{
+			LOG::ERROR("GPIO_BANK", "Mutex acquired failed for pinstate 3");
 			return;
+		}
 		if(state)
 		{
 			regs.olat->applyMask(generalMask);
