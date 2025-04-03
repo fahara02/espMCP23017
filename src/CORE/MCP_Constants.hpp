@@ -91,12 +91,12 @@ static constexpr uint16_t MAX_EVENT = 100;
 static constexpr uint16_t MAX_RETRY = 10;
 
 static constexpr TickType_t DEFAULT_I2C_TIMEOUT = pdMS_TO_TICKS(1000);
-static constexpr uint32_t I2C_READ_TIMEOUT_MS = 50;
 
 static constexpr TickType_t MUTEX_TIMEOUT = pdMS_TO_TICKS(50);
 static constexpr TickType_t RW_MUTEX_TIMEOUT = pdMS_TO_TICKS(50);
 static constexpr TickType_t I2C_MUTEX_TIMEOUT = pdMS_TO_TICKS(50);
-static constexpr TickType_t READ_TIMEOUT = pdMS_TO_TICKS(1000);
+static constexpr uint32_t I2C_READ_TIMEOUT_MS = 10;
+static constexpr TickType_t READ_TIMEOUT = pdMS_TO_TICKS(20);
 static constexpr uint16_t MAX_RECOVERY_ATTEMPTS = 50;
 enum class MASK
 {
