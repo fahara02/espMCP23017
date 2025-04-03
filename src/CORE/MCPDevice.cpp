@@ -321,23 +321,23 @@ void MCPDevice::digitalWrite(const int pin, const bool level)
 	gpioBank->setPinState(mask, level);
 }
 
-uint8_t MCPDevice::digitalRead(const PORT port, const uint8_t pinmask)
+int MCPDevice::digitalRead(const PORT port, const uint8_t pinmask)
 {
 	GPIO_BANK* gpioBank = (port == PORT::GPIOA) ? gpioBankA.get() : gpioBankB.get();
 	gpioBank->setGeneralMask(pinmask);
 	return gpioBank->getPinState(pinmask);
 }
-bool MCPDevice::digitalRead(const Pin pin)
+int MCPDevice::digitalRead(const Pin pin)
 {
 	return digitalRead(Util::getPortFromPin(pin.getEnum()), pin.getMask());
 }
-uint8_t MCPDevice::digitalRead(const PORT port)
+int MCPDevice::digitalRead(const PORT port)
 {
 	GPIO_BANK* gpioBank = (port == PORT::GPIOA) ? gpioBankA.get() : gpioBankB.get();
 	return gpioBank->getPinState();
 }
 
-bool MCPDevice::digitalRead(const int pin)
+int MCPDevice::digitalRead(const int pin)
 {
 	auto [port, mask] = getPortAndMask(pin);
 	return digitalRead(port, mask);

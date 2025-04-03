@@ -124,14 +124,14 @@ class MCPDevice : public std::enable_shared_from_this<MCPDevice>
 		return digitalWrite(port, pinmask, level);
 	}
 
-	bool digitalRead(const int pin);
-	bool digitalRead(const Pin pin);
-	uint8_t digitalRead(const PORT port, const uint8_t pinmask);
-	uint8_t digitalRead(const PORT port);
+	int digitalRead(const int pin);
+	int digitalRead(const Pin pin);
+	int digitalRead(const PORT port, const uint8_t pinmask);
+	int digitalRead(const PORT port);
 	template<typename FirstPin, typename... RestPins,
 			 typename = std::enable_if_t<(std::is_same_v<FirstPin, MCP::Pin> && ... &&
 										  std::is_same_v<RestPins, MCP::Pin>)>>
-	uint8_t digitalRead(FirstPin first, RestPins... rest)
+	int digitalRead(FirstPin first, RestPins... rest)
 	{
 		uint8_t pinmask = generateMask(first, rest...);
 		PORT port = first.getPort();
