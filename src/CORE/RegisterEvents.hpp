@@ -11,6 +11,7 @@
 #include <atomic>
 #include <memory>
 #include <unordered_map>
+#include "SemLock.hpp"
 
 enum class RegisterEvent : EventBits_t
 {
@@ -79,6 +80,7 @@ class EventManager
 {
   public:
 	static EventGroupHandle_t registerEventGroup;
+	static SemaphoreHandle_t eventMutex;
 
 	static void setBits(RegisterEvent e);
 	static void clearBits(RegisterEvent e);

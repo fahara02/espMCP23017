@@ -72,6 +72,7 @@ class MCPDevice
 	std::unordered_map<std::tuple<PORT, REG>, uint8_t> addressMap_;
 
 	static SemaphoreHandle_t regRWmutex;
+	static SemaphoreHandle_t sharedPtrMutex;
 	TaskHandle_t eventTaskHandle;
 
   public:

@@ -1,7 +1,7 @@
 #include "CORE/RegisterEvents.hpp"
 
 EventGroupHandle_t EventManager::registerEventGroup = nullptr;
-
+SemaphoreHandle_t EventManager::eventMutex = xSemaphoreCreateMutex();
 std::array<currentEvent, EventManager::MAX_EVENTS> EventManager::eventBuffer;
 std::atomic<size_t> EventManager::head{0};
 std::atomic<size_t> EventManager::tail{0};
@@ -73,6 +73,12 @@ bool EventManager::acknowledgeEvent(currentEvent* event)
 bool EventManager::createEvent(registerIdentity identity, RegisterEvent e, uint16_t valueOrSettings,
 							   bool intrFn)
 {
+
+	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
+	if(!lock.acquired())
+	{
+		return;
+	}
 	size_t currentTail = tail.load(std::memory_order_relaxed);
 	size_t nextTail = (currentTail + 1) % MAX_EVENTS;
 
@@ -106,6 +112,11 @@ bool EventManager::createEvent(registerIdentity identity, RegisterEvent e, uint1
 }
 void EventManager::clearAllErrorEvents()
 {
+	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
+	if(!lock.acquired())
+	{
+		return;
+	}
 	size_t currentHead = head.load(std::memory_order_acquire);
 	size_t currentTail = tail.load(std::memory_order_acquire);
 
@@ -130,6 +141,11 @@ void EventManager::clearAllErrorEvents()
 
 size_t EventManager::getQueueSize()
 {
+	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
+	if(!lock.acquired())
+	{
+		return 0;
+	}
 	size_t h = head.load(std::memory_order_acquire);
 	size_t t = tail.load(std::memory_order_acquire);
 	return (t >= h) ? (t - h) : (MAX_EVENTS - h + t);

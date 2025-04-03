@@ -7,6 +7,7 @@ namespace MCP
 {
 static int GLOBAL_ERROR_COUNT = 0;
 SemaphoreHandle_t MCPDevice::regRWmutex = xSemaphoreCreateMutex();
+SemaphoreHandle_t MCPDevice::sharedPtrMutex = xSemaphoreCreateMutex();
 MCPDevice::MCPDevice(MCP_MODEL model, gpio_num_t sda, gpio_num_t scl, gpio_num_t reset, bool pinA2,
 					 bool pinA1, bool pinA0) :
 	model_(model), sda_(sda), scl_(scl), reset_(reset), configuration_(model),
@@ -638,6 +639,11 @@ void MCPDevice::handleSettingChangeEvent(currentEvent* ev)
 
 Register* MCPDevice::getGPIORegister(REG reg, PORT port)
 {
+	SemLock lock(sharedPtrMutex, MUTEX_TIMEOUT);
+	if(!lock.acquired())
+	{
+		return nullptr;
+	}
 	if(port == PORT::GPIOA)
 	{
 
