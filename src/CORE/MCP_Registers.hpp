@@ -359,7 +359,6 @@ struct Register
 		if(reg != REG::IOCON)
 		{
 			value_ |= mask;
-			LOG::INFO(REG_TAG, "New Value %d set  in register 0x%02X", value_, regAddress_);
 			EventManager::createEvent(identity_, RegisterEvent::WRITE_REQUEST, value_, intrFun);
 		}
 	}
@@ -369,8 +368,6 @@ struct Register
 		if(reg != REG::IOCON)
 		{
 			value_ &= ~mask;
-			LOG::INFO(REG_TAG, "New Value %d set  in register 0x%02X", value_, regAddress_);
-
 			EventManager::createEvent(identity_, RegisterEvent::WRITE_REQUEST, value_, intrFun);
 		}
 	}
@@ -693,8 +690,8 @@ class GPIORegisters : public RegistersCollection
 			}
 		}
 
-		ESP_LOGE("MCPRegisters", "Failed to update register: Invalid address (0x%02X)",
-				 reg_address);
+		LOG::ERROR("MCPRegisters", "Failed to update register: Invalid address (0x%02X)",
+				   reg_address);
 		return false;
 	}
 
@@ -765,8 +762,8 @@ class InterruptRegisters : public RegistersCollection
 			}
 		}
 
-		ESP_LOGE("MCPRegisters", "Failed to update register: Invalid address (0x%02X)",
-				 reg_address);
+		LOG::ERROR("MCPRegisters", "Failed to update register: Invalid address (0x%02X)",
+				   reg_address);
 		return false;
 	}
 

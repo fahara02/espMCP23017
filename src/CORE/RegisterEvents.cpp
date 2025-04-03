@@ -111,7 +111,7 @@ bool EventManager::createEvent(registerIdentity identity, RegisterEvent e, uint1
 		eventBuffer[index] = currentEvent(e, identity, valueOrSettings, index);
 		if(e == RegisterEvent::ERROR)
 		{
-			LOG::INFO("EventManager", "Setting Error Event Bits");
+			LOG::ERROR("EventManager", "Setting Error Event Bits");
 		}
 		setBits(e);
 		return true;
@@ -123,7 +123,7 @@ bool EventManager::createEvent(registerIdentity identity, RegisterEvent e, uint1
 	tail.store(nextTail, std::memory_order_release);
 	if(e == RegisterEvent::ERROR)
 	{
-		LOG::INFO("EventManager", "Setting Error Event Bits");
+		LOG::ERROR("EventManager", "Setting Error Event Bits");
 	}
 	setBits(e);
 	return true;

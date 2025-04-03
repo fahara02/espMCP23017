@@ -38,8 +38,6 @@ MCPDevice::~MCPDevice()
 	}
 	for(const auto& regPair: addressMap_)
 	{
-		// regPair.first = tuple<PORT, REG>
-		// regPair.second = uint8_t (register address)
 
 		MCP::PORT port = std::get<0>(regPair.first); // Get PORT from tuple
 		MCP::REG reg = std::get<1>(regPair.first); // Get REG from tuple
@@ -267,7 +265,7 @@ void MCPDevice::pinMode(const PORT port, const uint8_t pinmask, const uint8_t mo
 			break;
 		case INPUT_PULLDOWN:
 
-			ESP_LOGE(MCP_TAG, "PullDown not available in MCP devices, defaulting to INPUT.");
+			LOG::ERROR(MCP_TAG, "PullDown not available in MCP devices, defaulting to INPUT.");
 			break;
 		case OUTPUT:
 			gpioBank->setPinDirection(pinmask, GPIO_MODE::GPIO_OUTPUT);
@@ -416,11 +414,7 @@ void MCPDevice::EventMonitorTask(void* param)
 				{
 					LOG::ERROR(MCP_TAG,
 							   "Maximum recovery attempts reached. Performing system reset");
-					// Consider more drastic measures here
-					// For example, you might want to reboot the entire ESP32
-					// esp_restart();  // Uncomment if you want to reboot the ESP32
 
-					// Or just reset the recovery counter and continue trying
 					recovery_attempts = 0;
 					recovery_delay = pdMS_TO_TICKS(2000); // Longer delay after max attempts
 				}
@@ -457,7 +451,7 @@ void MCPDevice::EventMonitorTask(void* param)
 			currentEvent* event = EventManager::getEvent(RegisterEvent::ERROR);
 			if(event)
 			{
-				LOG::INFO(MCP_TAG, "EventMonitorTask received eventBits: 0x%08X", eventBits);
+
 				LOG::ERROR(MCP_TAG, "ERROR event detected! Value: 0x%02X", event->data);
 				EventManager::acknowledgeEvent(event);
 				EventManager::clearBits(RegisterEvent::ERROR);
@@ -549,7 +543,7 @@ void MCPDevice::handleBankModeEvent(currentEvent* ev)
 		return;
 	}
 
-	Serial.printf("New Event %d BankMode changed \n", ev->id);
+	LOG::INFO("MCP_DEVICE", "New Event %d BankMode changed \n", ev->id);
 	EventManager::acknowledgeEvent(ev);
 	EventManager::clearBits(RegisterEvent::BANK_MODE_CHANGED);
 }
@@ -585,12 +579,6 @@ void MCPDevice::handleReadEvent(currentEvent* ev)
 
 		uint8_t valueA = static_cast<uint16_t>(value) & 0xFF; // extract lowByte
 		uint8_t valueB = (static_cast<uint16_t>(value) >> 8) & 0xFF; // extract highbyte
-
-		LOG::SUCCESS(MCP_TAG,
-					 "Read success for REG %s id=%d ; address %02X with value %02X "
-					 "PORTA =%02X "
-					 "and PORTB =%02X  \n",
-					 Util::ToString::REG(reg), ev->id, currentAddress, value, valueA, valueB);
 
 		if(intrFunctions)
 		{
@@ -640,7 +628,6 @@ void MCPDevice::handleWriteEvent(currentEvent* ev)
 	if(result == 0)
 	{
 
-		LOG::SUCCESS(MCP_TAG, "New Write success for address 0x%02X for id=%d ; \n", reg, ev->id);
 		EventManager::acknowledgeEvent(ev);
 		errorState_ = false;
 	}
@@ -662,12 +649,12 @@ void MCPDevice::handleSettingChangeEvent(currentEvent* ev)
 	uint8_t result = i2cBus_.write_mcp_register(reg, settings, bankMode_);
 	if(result == 0)
 	{
-		LOG::SUCCESS(REG_TAG, "New Setting Event sucessfull id=%d ; \n", ev->id);
+		LOG::SUCCESS("MCP_DEVICE", "New Setting Event sucessfull id=%d ; \n", ev->id);
 		EventManager::acknowledgeEvent(ev);
 	}
 	else
 	{
-		Serial.printf("New Setting Event failed for id=%d ; \n", ev->id);
+		LOG::ERROR("MCP_DEVICE", "New Setting Event failed for id=%d ; \n", ev->id);
 	}
 
 	EventManager::clearBits(RegisterEvent::SETTINGS_CHANGED);
@@ -682,12 +669,10 @@ Register* MCPDevice::getGPIORegister(REG reg, PORT port)
 	}
 	if(port == PORT::GPIOA)
 	{
-
 		return gpioBankA->getRegisterForUpdate(reg);
 	}
 	else
 	{
-
 		return gpioBankB->getRegisterForUpdate(reg);
 	}
 }
@@ -913,8 +898,8 @@ void MCPDevice::dumpRegisters() const
 			REG reg = static_cast<REG>(i);
 			uint8_t address = getRegisterAddress(reg, PORT::GPIOA);
 			uint8_t value = i2cBus_.read_mcp_register(address, bankMode_);
-			ESP_LOGI(MCP_TAG, "Register: %s, Address: 0x%02X, Value: 0x%02X",
-					 Util::ToString::REG(reg), address, value);
+			LOG::INFO(MCP_TAG, "Register: %s, Address: 0x%02X, Value: 0x%02X",
+					  Util::ToString::REG(reg), address, value);
 		}
 
 		// Read PORTB Registers
@@ -924,8 +909,8 @@ void MCPDevice::dumpRegisters() const
 			REG reg = static_cast<REG>(i);
 			uint8_t address = getRegisterAddress(reg, PORT::GPIOB);
 			uint8_t value = i2cBus_.read_mcp_register(address, bankMode_);
-			ESP_LOGI(MCP_TAG, "Register: %s, Address: 0x%02X, Value: 0x%02X",
-					 Util::ToString::REG(reg), address, value);
+			LOG::INFO(MCP_TAG, "Register: %s, Address: 0x%02X, Value: 0x%02X",
+					  Util::ToString::REG(reg), address, value);
 		}
 	}
 }
