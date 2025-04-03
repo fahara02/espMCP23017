@@ -16,24 +16,20 @@ const EventBits_t EventManager::REGISTER_EVENT_BITS_MASK =
 	static_cast<EventBits_t>(RegisterEvent::DATA_RECEIVED) |
 	static_cast<EventBits_t>(RegisterEvent::ERROR) |
 	static_cast<EventBits_t>(RegisterEvent::RESTART);
-void EventManager::clearEventsForIdentity(const registerIdentity& identity)
+void EventManager::deinitialize()
 {
-	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
-	if(!lock.acquired())
-		return;
-
-	size_t currentHead = head.load();
-	size_t currentTail = tail.load();
-
-	while(currentHead != currentTail)
+	if(registerEventGroup != nullptr)
 	{
-		if(eventBuffer[currentHead].regIdentity == identity)
-		{
-			eventBuffer[currentHead].AcknowledgeEvent();
-			eventIndexMap.erase(eventBuffer[currentHead].regIdentity);
-		}
-		currentHead = (currentHead + 1) % MAX_EVENTS;
+		vEventGroupDelete(registerEventGroup);
+		registerEventGroup = nullptr;
 	}
+	if(eventMutex != nullptr)
+	{
+		vSemaphoreDelete(eventMutex);
+		eventMutex = nullptr;
+	}
+	head = tail = 0;
+	eventIndexMap.clear();
 }
 void EventManager::initializeEventGroups()
 {
@@ -55,6 +51,12 @@ void EventManager::clearBits(RegisterEvent e)
 
 currentEvent* EventManager::getEvent(RegisterEvent eventType)
 {
+	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
+	if(!lock.acquired())
+	{
+		LOG::ERROR("EventManager", "Mutex acquire failed in getEvent");
+		return nullptr;
+	}
 	size_t currentHead = head.load(std::memory_order_acquire);
 	size_t currentTail = tail.load(std::memory_order_acquire);
 
@@ -74,6 +76,12 @@ bool EventManager::acknowledgeEvent(currentEvent* event)
 {
 	if(!event)
 		return false;
+	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
+	if(!lock.acquired())
+	{
+		LOG::ERROR("EventManager", "Mutex acquire failed in acknowledgeEvent");
+		return false;
+	}
 
 	event->AcknowledgeEvent();
 	eventIndexMap.erase(event->regIdentity);
@@ -95,6 +103,7 @@ bool EventManager::createEvent(registerIdentity identity, RegisterEvent e, uint1
 	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
 	if(!lock.acquired())
 	{
+		LOG::ERROR("EventManager", "Mutex acquire failed for create event");
 		return false;
 	}
 	size_t currentTail = tail.load(std::memory_order_relaxed);
@@ -128,11 +137,34 @@ bool EventManager::createEvent(registerIdentity identity, RegisterEvent e, uint1
 	setBits(e);
 	return true;
 }
+void EventManager::clearEventsForIdentity(const registerIdentity& identity)
+{
+	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
+	if(!lock.acquired())
+	{
+		LOG::ERROR("EventManager", "Mutex acquire failed for clear event");
+		return;
+	}
+
+	size_t currentHead = head.load();
+	size_t currentTail = tail.load();
+
+	while(currentHead != currentTail)
+	{
+		if(eventBuffer[currentHead].regIdentity == identity)
+		{
+			eventBuffer[currentHead].AcknowledgeEvent();
+			eventIndexMap.erase(eventBuffer[currentHead].regIdentity);
+		}
+		currentHead = (currentHead + 1) % MAX_EVENTS;
+	}
+}
 void EventManager::clearAllErrorEvents()
 {
 	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
 	if(!lock.acquired())
 	{
+		LOG::ERROR("EventManager", "Mutex acquire failed for clear All error");
 		return;
 	}
 	size_t currentHead = head.load(std::memory_order_acquire);
@@ -162,6 +194,7 @@ size_t EventManager::getQueueSize()
 	SemLock lock(eventMutex, MCP::MUTEX_TIMEOUT);
 	if(!lock.acquired())
 	{
+		LOG::ERROR("EventManager", "Mutex acquire failed for queue size");
 		return 0;
 	}
 	size_t h = head.load(std::memory_order_acquire);

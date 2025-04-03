@@ -41,7 +41,6 @@ struct registerIdentity
 		return (reg == other.reg) && (port == other.port) && (regAddress == other.regAddress);
 	}
 };
-
 namespace std
 {
 template<>
@@ -49,11 +48,26 @@ struct hash<registerIdentity>
 {
 	size_t operator()(const registerIdentity& key) const
 	{
-		return static_cast<size_t>(key.reg) ^ static_cast<size_t>(key.port) ^
-			   static_cast<size_t>(key.regAddress);
+		size_t h = 17;
+		h = h * 31 + hash<MCP::REG>{}(key.reg);
+		h = h * 31 + hash<MCP::PORT>{}(key.port);
+		h = h * 31 + hash<uint8_t>{}(key.regAddress);
+		return h;
 	}
 };
 } // namespace std
+// namespace std
+// {
+// template<>
+// struct hash<registerIdentity>
+// {
+// 	size_t operator()(const registerIdentity& key) const
+// 	{
+// 		return static_cast<size_t>(key.reg) ^ static_cast<size_t>(key.port) ^
+// 			   static_cast<size_t>(key.regAddress);
+// 	}
+// };
+// } // namespace std
 
 struct currentEvent
 {
@@ -79,9 +93,9 @@ struct currentEvent
 class EventManager
 {
   public:
+	static void deinitialize();
 	static EventGroupHandle_t registerEventGroup;
 	static SemaphoreHandle_t eventMutex;
-
 	static void setBits(RegisterEvent e);
 	static void clearBits(RegisterEvent e);
 	static void initializeEventGroups();
@@ -95,7 +109,6 @@ class EventManager
 
   private:
 	static const EventBits_t REGISTER_EVENT_BITS_MASK;
-
 	static constexpr size_t MAX_EVENTS = MCP::MAX_EVENT;
 	static std::array<currentEvent, MAX_EVENTS> eventBuffer;
 	static std::atomic<size_t> head;
