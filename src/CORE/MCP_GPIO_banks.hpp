@@ -6,6 +6,7 @@
 #include "COM/i2cBus.hpp"
 #include "memory"
 #include <unordered_map>
+#include "SemLock.hpp"
 
 #define BANK_TAG "GPIO_BANK"
 namespace MCP
@@ -14,6 +15,7 @@ namespace MCP
 class GPIO_BANK
 {
   private:
+	SemaphoreHandle_t bankMutex;
 	std::array<Pin, PIN_PER_BANK> Pins;
 	GPIORegisters regs;
 
@@ -22,7 +24,7 @@ class GPIO_BANK
 		Pins(createPins(port)), regs(GPIORegisters(icon)), model(m), generalMask(0XFF),
 		port_name(port)
 	{
-
+		bankMutex = xSemaphoreCreateMutex();
 		regs.setup(model, port_name, bankMode);
 		init();
 	}
@@ -37,12 +39,18 @@ class GPIO_BANK
 	{
 		// icon register not need to be invoked again as this method is already
 		// invoked and icon is updated  ,just notify this class for updating address
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		bankMode = value;
 		regs.updateAddress(bankMode);
 		return true;
 	}
 	bool updateRegisterValue(uint8_t reg_address, uint8_t value)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		return regs.updateRegisterValue(reg_address, value);
 	}
 
@@ -58,11 +66,17 @@ class GPIO_BANK
 	// PIN DIRECTION SELECTION
 	void setPinDirection(PIN p, GPIO_MODE m)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		assert(Util::getPortFromPin(p) == port_name && "Invalid pin ");
 		regs.iodir->setBitField(static_cast<uint8_t>(p), m == GPIO_MODE::GPIO_INPUT);
 	}
 	void setPinDirection(uint8_t pinmask, GPIO_MODE mode)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		if(mode == GPIO_MODE::GPIO_INPUT)
 		{
 			regs.iodir->applyMask(pinmask);
@@ -75,7 +89,9 @@ class GPIO_BANK
 
 	void setPinDirection(GPIO_MODE mode)
 	{
-
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		if(mode == GPIO_MODE::GPIO_INPUT)
 		{
 			regs.iodir->applyMask(generalMask);
@@ -89,12 +105,18 @@ class GPIO_BANK
 	// PULLUP SELECTION
 	void setPullup(PIN pin, PULL_MODE mode)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		assert(Util::getPortFromPin(pin) == port_name && "Invalid pin ");
 		regs.gppu->setBitField(static_cast<uint8_t>(pin), mode == PULL_MODE::ENABLE_PULLUP);
 	}
 
 	void setPullup(uint8_t pinMask, PULL_MODE mode)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		if(mode == PULL_MODE::ENABLE_PULLUP)
 		{
 			regs.gppu->applyMask(pinMask);
@@ -107,6 +129,9 @@ class GPIO_BANK
 
 	void setPullup(PULL_MODE mode)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		if(mode == PULL_MODE::ENABLE_PULLUP)
 		{
 			regs.gppu->applyMask(generalMask);
@@ -134,11 +159,17 @@ class GPIO_BANK
 	// SET PIN POLARITY
 	void setInputPolarity(PIN pin, INPUT_POLARITY pol)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		assert(Util::getPortFromPin(pin) == port_name && "Invalid pin ");
 		regs.ipol->setBitField(static_cast<uint8_t>(pin), pol == INPUT_POLARITY::INVERTED);
 	}
 	void setInputPolarity(uint8_t pinmask, INPUT_POLARITY pol)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		if(pol == INPUT_POLARITY::INVERTED)
 		{
 			regs.ipol->applyMask(pinmask);
@@ -150,6 +181,9 @@ class GPIO_BANK
 	}
 	void setInputPolarity(INPUT_POLARITY pol)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		if(pol == INPUT_POLARITY::INVERTED)
 		{
 			regs.ipol->applyMask(generalMask);
@@ -162,15 +196,27 @@ class GPIO_BANK
 
 	// SET PIN VALUE
 	// Inside the GPIO_BANK class declaration
-	void setOutput(uint8_t value) { regs.olat->setValue(value); }
+	void setOutput(uint8_t value)
+	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
+		regs.olat->setValue(value);
+	}
 	void setPinState(PIN pin, bool state)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		assert(Util::getPortFromPin(pin) == port_name && "Invalid pin ");
 		regs.olat->setBitField(static_cast<uint8_t>(pin), state);
 	}
 
 	void setPinState(uint8_t pinmask, bool state)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		if(state)
 		{
 			regs.olat->applyMask(pinmask);
@@ -183,6 +229,9 @@ class GPIO_BANK
 
 	void setPinState(bool state)
 	{
+		SemLock lock(bankMutex, MUTEX_TIMEOUT);
+		if(!lock.acquired())
+			return;
 		if(state)
 		{
 			regs.olat->applyMask(generalMask);
