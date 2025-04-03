@@ -197,7 +197,7 @@ class GPIO_BANK
 		}
 		else
 		{
-			return static_cast<uint8_t>(raw_value)
+			return static_cast<uint8_t>(raw_value);
 		}
 	}
 
